@@ -1,0 +1,49 @@
+{% extends "main.html" %}
+
+{% block head %}
+<!-- <html lang="en" dir="ltr">
+    <meta charset="utf-8"> -->
+<title>学生信息</title>
+    <link href="https://zdcd.online/api/jtabel/themes/redmond/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css" />
+    <link href="https://zdcd.online/api/jtabel/scripts/jtable/themes/lightcolor/blue/jtable.css" rel="stylesheet" type="text/css" />
+    <script src="https://zdcd.online/api/jtabel/scripts/jquery-1.6.4.min.js" type="text/javascript"></script>
+    <script src="https://zdcd.online/api/jtabel/scripts/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
+    <script src="https://zdcd.online/api/jtabel/scripts/jtable/jquery.jtable.js" type="text/javascript"></script>
+{% end %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron">
+      <div align="center">
+        <h1>学生信息</h1>
+      </div>
+    </div>
+    <div id="PersonTableContainer"></div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#PersonTableContainer').jtable({
+                title: 'Table of people',
+                actions: {
+                    listAction: '/editstudent/list',
+                    createAction: '/editstudent/create',
+                    updateAction: '/editstudent/update',
+                    deleteAction: '/editstudent/delete'
+                },
+                fields: {
+                        {{ col_names[0] }}: {
+                                key: true,
+                                list: false
+                            },
+                    {% for col_name, disp_name in zip(col_names[1:], disp_names[1:]) %}
+                        {{col_name}} : {
+                            title: "{{disp_name}}",
+                        },
+                    {% end %}
+
+                }
+            });
+            $('#PersonTableContainer').jtable('load');
+        });
+    </script>
+</div>
+{% end %}

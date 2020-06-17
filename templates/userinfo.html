@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+
+{% block head %}
+    <title>用户信息</title>
+{% end %}
+
+ {% block body %}
+    <div class="container">
+        <div class="jumbotron">
+          <div align="center">
+            <h1>我的信息</h1>
+          </div>
+        </div>
+        <div  class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="text-center">
+                    <tr>
+                        {% for l in INFO %}
+                        <th>{{l}}</th>
+                        {% end %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {% for l in info %}
+                        <td>{{l}}</td>
+                        {% end %}
+                    </tr>
+                </tbody>
+            </table>
+            <span> <a href="/changepasswd" class="btn btn-info" role="button">修改密码</a></span>
+
+
+        </div>
+    </div>
+{% end %}

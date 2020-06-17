@@ -1,0 +1,40 @@
+{% extends "main.html" %}
+
+{% block head %}
+<title>学生查看成绩信息</title>
+
+{% end %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron">
+        <div align="center">
+          <h2>{{nameinfo}}的成绩信息</h2>
+        </div>
+      </div>
+    <table class="table table-bordered">
+<!-- TODO: 班级值不对 -->
+<!-- TODO: 成绩 没有是 none -->
+        <thead>
+          <tr>
+            {% for item in disp_names %}
+            <th>{{item}}</th>
+            {% end %}
+          </tr>
+        </thead>
+
+        <tbody>
+            {% for items in gradeinfo %}
+            <tr>
+                {% for item in items %}
+                <td>
+                    {{item}}
+                </td>
+                {% end %}
+            </tr>
+            {% end %}
+        </tbody>
+    </table>
+</div>
+
+{% end %}

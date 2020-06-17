@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="author" content="davidlin">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/floating-labels/">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+
+    <link href="//cdn.bootcss.com/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+    <script src="//cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+
+    <!-- <script src="//code.jquery.com/jquery-3.1.1.min.js"></script> -->
+
+    {% block head %}
+    {% end %}
+</head>
+<body>
+
+{% try %}
+{% if disable_nav %}
+{% end %}
+{% except %}
+<header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        {% if role == b"admin" %}
+        <a class="navbar-brand" href="/">WebSRS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">主页 <span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="nav-item active">
+                    <a class="nav-link" href="/plans">选课计划操作</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        维护信息
+                    </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/editCourse">课程信息</a>
+                    <a class="dropdown-item" href="editteacher">维护教师信息</a>
+                    <a class="dropdown-item" href="editstudent">维护学生信息</a>
+                    <a class="dropdown-item" href="userinfo">个人信息</a>
+
+                </div>
+            </ul>
+            <span class="navbar-text navbar-right"><strong>当前身份：{{role}}&ensp;</strong></span>
+            <span class="navbar-text navbar-right">
+                <a href="#" onclick="logout()" style="color: #9a9da0" title="退出登录">
+                  退出
+                  <img src="{{static_url("log-out.png")}}" style="zoom:80% "  border=0>
+                </a>
+            </span>
+        </div>
+        {% end %}
+        {% if role == b"teacher" %}
+        <a class="navbar-brand" href="/">WebSRS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">主页 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        信息查询
+                    </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="teacher_class">查看所教课程</a>
+                    <a class="dropdown-item" href="userinfo">查看个人信息</a>
+
+                </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tplans">选课</a>
+                </li>
+            </ul>
+            <span class="navbar-text navbar-right"><strong>当前身份：{{role}}&ensp;</strong></span>
+            <span class="navbar-text navbar-right">
+                <a href="#" onclick="logout()" style="color: #9a9da0" title="退出登录">
+                  退出
+                  <img src="{{static_url("log-out.png")}}" style="zoom:80% "  border=0>
+                </a>
+            </span>
+
+        </div>
+        {% end %}
+        {% if role == b"student" %}
+        <a class="navbar-brand" href="/">WebSRS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">主页 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                        信息查询
+                    </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="courses">查看所选课程</a>
+                    <a class="dropdown-item" href="studentviewgrades">查询成绩信息</a>
+                    <a class="dropdown-item" href="userinfo">查看个人信息</a>
+                </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="/chooseClass">选课</a>
+                </li>
+            </ul>
+            <span class="navbar-text navbar-right"><strong>当前身份：{{role}}&ensp;</strong></span>
+            <span class="navbar-text navbar-right">
+                <a href="#" onclick="logout()" style="color: #9a9da0" title="退出登录">
+                  退出
+                  <img src="{{static_url("log-out.png")}}" style="zoom:80% "  border=0>
+                </a>
+            </span>
+        </div>
+        {% end %}
+    </nav>
+</header>
+<br><br><br>
+
+
+
+
+
+{% end %}
+
+
+        {% block body %}
+        {% end %}
+
+
+        {% block footer%}
+        {% end %}
+
+        {% try %}
+        {% if disable_nav %}
+        {% end %}
+        {% except %}
+          <style media="screen">
+            #footer {
+              background:#343a40;
+              height:50px;
+            }
+          </style>
+          <div class="container-fluid p-3 p-md-5 ">
+              <nav class="navbar fixed-bottom" id="footer">
+                <p  style="color:#fff;text-align: center;">Copyright © 2019-2020 小康一家工作室 All Rights Reserved.</p>
+              </nav>
+          </div>
+        {% end %}
+
+<script type="text/javascript">
+function logout(){
+  console.log("logging out")
+  $.ajax({
+    url:"/logout",
+    success:function(result){
+      window.location.href="/";
+    }
+  });
+}
+</script>
+
+
+</body>
+</html>

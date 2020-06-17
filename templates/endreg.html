@@ -1,0 +1,108 @@
+{% extends "main.html" %}
+
+{% block head %}
+<title>结束选课</title>
+
+{% end %}
+
+{% block body %}
+
+<div class="container">
+    <div class="jumbotron">
+        <div align="center">
+          <h2>结束选课</h2>
+        </div>
+      </div>
+
+    <div id="reg_info"></div>
+    <a href="#" type="button" onclick="end_reg()" class="btn btn-primary">开始排课</a>
+    <a href="#" type="button" onclick="modify_db()" class="btn btn-primary">确认删除</a>
+</div>
+
+
+<!-- TODO: 把选课基本信息打出来 -->
+<!-- TODO: 确认删除提示 -->
+<script type="text/javascript">
+  toastr.options = { // toastr配置
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "progressBar": false, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
+        "positionClass": "toast-top-right",//显示的动画时间
+        "showDuration": "400", //显示的动画时间
+        "hideDuration": "1000", //消失的动画时间
+        "timeOut": "7000", //展现时间
+        "extendedTimeOut": "1000", //加长展示时间
+        "showEasing": "swing", //显示时的动画缓冲方式
+        "hideEasing": "linear", //消失时的动画缓冲方式
+        "showMethod": "fadeIn", //显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    }
+
+  let end_reg_res = "";
+  function end_reg() {
+    $.ajax({
+      url:"/endregistration",
+      type: "POST",
+      data: {
+        planid:{{planid}},
+        action:"endreg"
+      },
+      dataType: "json",
+      success:function(res) {
+        console.log("end reg ret", res)
+        if(res['status'] == "success") {
+          // 进行成功操作
+          console.log("in success")
+          // $("#reg_info").html(res['cls_to_del'])
+          var cls_to_del = res['cls_to_del']
+          if(cls_to_del.length==0){
+              console.log("没有要删除的教学班")
+                $("#reg_info").append`<h1>没有要删除的教学班</h1>`}
+          else {
+              console.log("请确认要删除的教学班：")
+              $("#reg_info").append`<h1>请确认要删除的教学班：</h1>`}
+          for(var i=0;i<cls_to_del.length;i++) {
+            $("#reg_info").append(`<h1>${cls_to_del[i]}</h1>`)
+          }
+
+          end_reg_res=res;
+          toastr.success(res['message'], "排课成功")
+        } else {
+          toastr.error(res['message'], "排课失败")
+        }
+    }
+    });
+  }
+
+  function modify_db() {
+    console.log("modify params",end_reg_res)
+    let cls_to_del = end_reg_res['cls_to_del'];
+    console.log("cls_to_del", cls_to_del)
+    $.ajax({
+      url:"/endregistration",
+      type: "POST",
+      data: {
+        planid:{{planid}},
+        action:"modify",
+        cls_to_del: JSON.stringify(cls_to_del),
+        choicelist: JSON.stringify(end_reg_res['choicelist']),
+        registration_temp: JSON.stringify(end_reg_res['registration_temp']),
+      },
+      dataType: "json",
+      success:function(res) {
+        console.log(res)
+        if(res['status'] == "success") {
+          // 进行成功操作
+          toastr.success(res['message'], "修改数据库成功")
+        } else {
+          toastr.error(res['message'], "修改数据库失败")
+        }
+
+      }
+    });
+  }
+
+</script>
+
+
+{% end %}

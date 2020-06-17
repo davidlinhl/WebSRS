@@ -1,0 +1,110 @@
+{% extends "main.html" %}
+
+{% block head %}
+<title>查看所教课程</title>
+{% end %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron">
+        <div align="center">
+            <h2>所教课程</h2>
+        </div>
+    </div>
+<div  class="table-responsive">
+  {% if down %}
+  <div align="center">
+    <text>“课程目录数据库”链接失败，当前无法选课</text>
+  </div>
+  {% else %}
+
+    <table class="table table-bordered table-hover" >
+        <thead class="text-center">
+          <!-- {{classes}} -->
+          <tr>
+            {% for l in l_names %}
+              <th>{{l}}</th>
+            {% end %}
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for cl in classes %}
+          <tr>
+            {% for i in range(len(cl)-1) %}
+            <td  rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                {% if i == 5%}
+                  {% for time in cl[5]%}
+                  {{time}} <br>
+                  {% end %}
+                {% else %}
+                  {{cl[i]}}
+                {% end %}
+            </td>
+            {% end %}
+
+<!-- TODO: 选课之后改变按钮状态 -->
+<!-- TODO: 根据按钮状态render页面，已经选的不显示按钮 -->
+              <td class="text-center">
+                  <form  action="tscourse?teacherid={{teacherid}}&classid={{cl[2]}}&planid={{planid}}"  method="post"  onsubmit="return myFunction({{cl[7]}},{{cl[5]}},{{teacher_time_list}})">
+
+		            <input class="btn btn-info" type="submit" value="选课" >
+                  </form>
+              </td>
+          </tr>
+        {% end %}
+        </tbody>
+    </table>
+    {% end %}
+</div>
+
+</div>
+
+<script>
+  toastr.options = { // toastr配置
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "progressBar": false, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
+        "positionClass": "toast-top-right",//显示的动画时间
+        "showDuration": "400", //显示的动画时间
+        "hideDuration": "1000", //消失的动画时间周
+        "timeOut": "7000", //展现时间
+        "extendedTimeOut": "1000", //加长展示时间
+        "showEasing": "swing", //显示时的动画缓冲方式
+        "hideEasing": "linear", //消失时的动画缓冲方式
+        "showMethod": "fadeIn", //显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    }
+
+    function myFunction(teacherid,class_time,teacher_time_list)
+{
+    if (teacherid != -1)
+    {
+        toastr.error("该课程已有教师","选课失败");
+        return false;
+    }
+    if (teacherid == -1)
+    {
+          console.log(String(class_time));
+          console.log(String(teacher_time_list[4]));
+
+        for (var i=0 ;i<teacher_time_list.length;i++)
+        {
+            if(String(class_time)==String(teacher_time_list[i]))
+            {
+                toastr.error("时间冲突","选课失败");
+                return false;
+            }
+
+        }
+        toastr.success("选课成功！","成功");
+            return true;
+    }
+}
+
+
+</script>
+
+
+
+{% end %}

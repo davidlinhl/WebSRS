@@ -1,0 +1,132 @@
+{% extends "main.html" %}
+
+{% block head %}
+<title>登记教授班级{{classid}}学生成绩</title>
+
+{% end %}
+
+{% block body %}
+<div class="container">
+
+    <div class="jumbotron">
+            <div align="center">
+                <h2>登记学生成绩</h2>
+            </div>
+    </div>
+
+<div  class="table-responsive">
+
+<form class="form-enter-grade" action="\enter_grade?classid={{classid}}" method="post"  action="demo-form.php">
+
+    <table class="table table-bordered table-hover">
+
+        <thead class="text-center">
+          <tr>
+            {% for l in l_names %}
+            <th>{{l}}</th>
+            {% end %}
+
+          </tr>
+        </thead>
+
+        <tbody>
+            <input hidden type="text" value="{{len(students)}}" name="studentnum">
+            {% for i in range(len(students)) %}
+
+            <tr>
+                {% for j in range(4) %}
+                        <td>
+                            {{students[i][j]}}
+                        </td>
+                {% end %}
+                <td>
+                    <div class="inputbox text-center ">
+                        <input hidden type="text" value="{{students[i][5]}}" name="registrationid{{i}}">
+<!--                        <input  id="numb" type="text"-->
+<!--                                    value="{{students[i][4]}}"-->
+<!--                                name="score{{i}}" oninput="value=value.replace(/[^\d]/g,'')">-->
+                        <!-- <input type="number" name="score{{i}}" min="1" max="100"  value="{{students[i][4]}}"  oninput="value=value.replace(/[^\d]/g,'')"> -->
+                        <input type="text" name="score{{i}}" value="{{students[i][4]}}" id="score{{i}}" oninput="check_grade('score{{i}}')">
+<!-- TODO: 上成绩的输入框没有样式 -->
+                    </div>
+                </td>
+
+            </tr>
+            {% end %}
+
+        </tbody>
+    </table>
+
+<div align="center"><button  class="btn btn-info " type="submit"  >提交</button></div>
+
+<!--    <input type="submit" value="提交" onclick="beforeSubmit()"/>-->
+<!--<button type="button" onclick="myFunction()">提交</button>-->
+</form>
+
+
+<script>
+  toastr.options = { // toastr配置
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "progressBar": false, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
+        "positionClass": "toast-top-right",//显示的动画时间
+        "showDuration": "400", //显示的动画时间
+        "hideDuration": "1000", //消失的动画时间
+        "timeOut": "7000", //展现时间
+        "extendedTimeOut": "1000", //加长展示时间
+        "showEasing": "swing", //显示时的动画缓冲方式
+        "hideEasing": "linear", //消失时的动画缓冲方式
+        "showMethod": "fadeIn", //显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    }
+
+
+  function check_grade(inputid) {
+    console.log("inputting")
+    score = $("#" + inputid).val()
+    console.log(score)
+    for(var ind=0;ind<score.length;ind++) {
+      console.log(score[ind])
+      // && !(score[ind]=='A' || score[ind]=='B' || score[ind]=='C' || score[ind]=='D' || score[ind]=='F' || score[ind]=='I')
+      if(! (score[ind]>='0' && score[ind]<='9')  && !(score[ind]=='A' || score[ind]=='B' || score[ind]=='C' || score[ind]=='D' || score[ind]=='F' || score[ind]=='I')) {
+        console.log("invalid", score[ind])
+        $("#" + inputid).val("")
+        toastr.error("输入的成绩不合法","错误")
+      }
+    }
+    return true
+  }
+      function myFunction() {
+                                alert(" 添加成绩成功！");
+                            }
+                        </script>
+
+<!--<script type="text/javascript">-->
+<!--    function beforeSubmit()-->
+<!--    {-->
+<!--        var num = document.getElementById('student_num').value;-->
+<!--        for(i=0;i<num;i++)-->
+<!--        {-->
+<!--            var score = document.getElementById('score'+str(i)).value;-->
+<!--            var x;-->
+<!--            x="yyyyyyyesok~"-->
+<!--            document.getElementById("demo").innerHTML=x;-->
+<!--            if (score.length == 0 || score.length == 1 || score.length == 2 || score == '100')-->
+<!--            {-->
+<!--                return true;-->
+<!--            } else-->
+<!--            {-->
+<!--            document.getElementById("demo").innerHTML=score;-->
+
+<!--            return false;-->
+<!--            }-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+
+
+
+</div>
+
+</div>
+{% end %}

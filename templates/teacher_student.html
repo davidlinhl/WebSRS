@@ -1,0 +1,58 @@
+{% extends "main.html" %}
+
+{% block head %}
+<title>查看教授班级{{classid}}学生信息</title>
+
+{% end %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron">
+        <div align="center">
+            <h2>所选该课程学生信息</h2>
+        </div>
+    </div>
+    <div  class="table-responsive" >
+    <table class="table table-bordered table-hover">
+        <thead class="text-center">
+          <tr>
+            {% for l in l_names %}
+            <th>{{l}}</th>
+            {% end %}
+          </tr>
+        </thead>
+
+        <tbody>
+            {% for st in students %}
+
+          <tr>
+              {% for i in range(len(st)-1) %}
+             <td>
+               {% if i == 2 %}
+                 {% if st[2] == 1 %}
+                    男
+                 {% else %}
+                    女
+                 {% end %}
+               {% else %}
+                  {{st[i]}}
+               {% end %}
+             {% end %}
+             </td>
+
+               {% if st[9] is None %}
+                  <td></td>
+               {% else %}
+                  <td>{{st[9]}}</td>
+               {% end %}
+          </tr>
+
+            {% end %}
+        </tbody>
+    </table>
+
+</div>
+
+</div>
+
+{% end %}

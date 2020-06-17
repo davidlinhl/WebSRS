@@ -1,0 +1,109 @@
+{% extends "main.html" %}
+
+
+{% block head%}
+<title>主页</title>
+{% end%}
+
+
+
+{% block body %}
+<div class="container">
+    <div id="demo" class="carousel slide" data-ride="carousel">
+    <!-- 指示符 -->
+    <ul class="carousel-indicators">
+      <li data-target="#demo" data-slide-to="0" class="active"></li>
+      <li data-target="#demo" data-slide-to="1"></li>
+      <li data-target="#demo" data-slide-to="2"></li>
+    </ul>
+    <!-- 轮播图片 -->
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <a href="https://mp.weixin.qq.com/s/PtmSncoPVg5I1uZFzV9BbA">
+          <img src="https://www.jlu.edu.cn/images/20200527bannerjldxbn.jpg" class="rounded">
+        </a>
+      </div>
+      <div class="carousel-item">
+        <a href="https://news.jlu.edu.cn/info/1211/51206.htm">
+          <img src="https://www.jlu.edu.cn/images/20200501b.jpg" class="rounded">
+        </a>
+      </div>
+      <div class="carousel-item">
+        <a href="https://news.jlu.edu.cn/info/1021/50433.htm">
+          <img src="https://www.jlu.edu.cn/images/20200417b.jpg" class="rounded">
+        </a>
+      </div>
+    </div>
+    <!-- 左右切换按钮 -->
+    <a class="carousel-control-prev" href="#demo" data-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </a>
+    <a class="carousel-control-next" href="#demo" data-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </a>
+
+    </div>
+</div>
+
+<br>
+<div class="container">
+  <ul class="list-group">
+    <a href="#" class="list-group-item active">
+      <h6 class="list-group-item-heading">
+        新闻列表
+      </h6>
+    </a>
+  	<li class="list-group-item">
+        <a href="https://news.jlu.edu.cn/info/1021/51154.htm"><strong>[置顶]</strong>吉林大学4千余名研究生返校</a>
+      <img src="data:image/gif;base64,R0lGODlhHAALAJEAAP////+aAP4BAgAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQEMgD/ACwAAAAAHAALAAACKYQRqct836IMzyR0Z6vYUu1UGYKBl/hRpcllrqlCsMSt81mX+Z7jfF0AACH5BAUyAAIALAsAAgAEAAUAAAIHFA6iaLpXAAAh+QQFMgACACwQAAIABwAFAAACCoRkmLsHBpF0ogAAIfkEBTIAAgAsBQACABIABQAAAgiMj6nL7Q9hAQAh+QQFMgACACwFAAIAEgAFAAACFIRuAquI3JJrytia8tsyRplBoFAAADs=" width="28" height="11" >
+
+    </li>
+  	<li class="list-group-item">
+      <a href="https://news.jlu.edu.cn/info/1021/51155.htm"><strong>[置顶]</strong>高举精神旗帜 践行初心使命</a>
+      <img src="data:image/gif;base64,R0lGODlhHAALAJEAAP////+aAP4BAgAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQEMgD/ACwAAAAAHAALAAACKYQRqct836IMzyR0Z6vYUu1UGYKBl/hRpcllrqlCsMSt81mX+Z7jfF0AACH5BAUyAAIALAsAAgAEAAUAAAIHFA6iaLpXAAAh+QQFMgACACwQAAIABwAFAAACCoRkmLsHBpF0ogAAIfkEBTIAAgAsBQACABIABQAAAgiMj6nL7Q9hAQAh+QQFMgACACwFAAIAEgAFAAACFIRuAquI3JJrytia8tsyRplBoFAAADs=" width="28" height="11" >
+
+    </li>
+  	<li class="list-group-item">
+      <a href="https://news.jlu.edu.cn/info/1021/51153.htm">吉林大学召开定点扶贫工作推进会</a>
+      <img src="data:image/gif;base64,R0lGODlhHAALAJEAAP////+aAP4BAgAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQEMgD/ACwAAAAAHAALAAACKYQRqct836IMzyR0Z6vYUu1UGYKBl/hRpcllrqlCsMSt81mX+Z7jfF0AACH5BAUyAAIALAsAAgAEAAUAAAIHFA6iaLpXAAAh+QQFMgACACwQAAIABwAFAAACCoRkmLsHBpF0ogAAIfkEBTIAAgAsBQACABIABQAAAgiMj6nL7Q9hAQAh+QQFMgACACwFAAIAEgAFAAACFIRuAquI3JJrytia8tsyRplBoFAAADs=" width="28" height="11" >
+
+    </li>
+  	<li class="list-group-item">
+  		<span class="badge"></span>
+  		<a href="https://news.jlu.edu.cn/info/1021/51148.htm">吉林大学召开2020年第十二次校长办公会议</a>
+  	</li>
+  </ul>
+
+    <br>
+
+  <ul class="list-group">
+    <a href="#" class="list-group-item active">
+      <h6 class="list-group-item-heading">
+        学院新闻
+      </h6>
+    </a>
+  	<li class="list-group-item">
+      <a href="http://ccst.jlu.edu.cn/info/1092/11710.htm"><strong>[置顶]</strong>战“疫”进行中，停课不停赛 ——计算机学院网络安全竞赛在疫情期间取得佳绩</a>
+        <img src="data:image/gif;base64,R0lGODlhHAALAJEAAP////+aAP4BAgAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQEMgD/ACwAAAAAHAALAAACKYQRqct836IMzyR0Z6vYUu1UGYKBl/hRpcllrqlCsMSt81mX+Z7jfF0AACH5BAUyAAIALAsAAgAEAAUAAAIHFA6iaLpXAAAh+QQFMgACACwQAAIABwAFAAACCoRkmLsHBpF0ogAAIfkEBTIAAgAsBQACABIABQAAAgiMj6nL7Q9hAQAh+QQFMgACACwFAAIAEgAFAAACFIRuAquI3JJrytia8tsyRplBoFAAADs=" width="28" height="11" >
+    </li>
+  	<li class="list-group-item">
+      <a href="http://ccst.jlu.edu.cn/info/1092/11708.htm">计算机科学与技术学院2020年博士研究生招生考试考生须知</a>
+    </li>
+  	<li class="list-group-item">
+      <a href="http://ccst.jlu.edu.cn/info/1092/11701.htm">吉林大学计算机科学与技术学院2020年博士研究生考试招生工作办法</a>
+    </li>
+  	<li class="list-group-item">
+  		<span class="badge"></span>
+  		<a href="http://ccst.jlu.edu.cn/info/1092/11697.htm">吉林大学计算机科学与技术学院关于公布2020年博士研究生普通招考招生专业计划的通知</a>
+  	</li>
+  </ul>
+
+    <br><br><br>
+
+</div>
+{% end %}
+
+
+{% block footer%}
+
+{% end %}

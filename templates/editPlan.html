@@ -1,0 +1,354 @@
+{% extends "main.html" %}
+
+{% block head %}
+<title>{{type}}选课计划</title>
+{% end %}
+
+{% block body%}
+
+<div class="container">
+  <div class="jumbotron">
+    <div align="center">
+      <h1>{{type}}选课计划</h1>
+    </div>
+  </div>
+
+  <form role="form" action="/editPlan/save" method="post">
+    {% raw xsrf_form_html() %} <!-- post token，防止伪造请求 -->
+  	<div class="form-group">
+      <label for="name" class="col-sm-6 control-label" value={{planinfo[2]}}>选课计划名称</label>
+  		<div class="col-sm-8">
+        <input type="text" class="form-control" id="name" name="name" placeholder="请输入选课计划名称" value="{{planinfo[2]}}" required="">
+  		</div>
+      <br>
+    </div>
+
+
+    <div class="form-group">
+      <label for="academyid">选课学院</label>
+      <div class="col-sm-8">
+        <select class="form-control" name="academyid" id="academyid">
+          {% for academy in academies%}
+            <option value="{{academy[0]}}"
+              {% if academy[0] == planinfo[3] %} selected="selected" {% end %} >
+              {{academy[1]}}
+            </option>
+          {% end %}
+        </select>
+      </div>
+    </div>
+
+
+    <div class="form-group">
+      <label for="grade">选课年级</label>
+      <div class="col-sm-8">
+        <select class="form-control" name="grade" id="grade">
+          {% for n,v in zip(grade_names, grade_vals) %}
+            <option value="{{v}}"
+            {% if v == planinfo[4] %} selected="selected" {% end %} >
+            {{n}}</option>
+          {% end %}
+        </select>
+      </div>
+      <br>
+    </div>
+
+    <div class="form-group">
+      <label for="start_time">学生选课开始时间</label>
+      <div class="row">
+        <div class="col-sm-4">
+          <input type="date" class="form-control" name="start_day" id="start_day" value="{{planinfo[5][0]}}" min="{{curr_day}}"> &nbsp;
+        </div>
+        <div class="col-sm-4">
+          <input type="time" class="form-control" name="start_time" id="start_time" value="{{planinfo[5][1]}}" >
+    		</div>
+      </div>
+    </div>
+
+
+  <div class="form-group">
+    <label for="end_time">学生选课截止时间</label>
+    <div class="row">
+      <div class="col-sm-4">
+        <input type="date" class="form-control" name="end_day" id="end_day" value="{{planinfo[6][0]}}" min="{{curr_day}}">
+      </div>
+      <div class="col-sm-4">
+        <input type="time" class="form-control" name="end_time" id="end_time" value="{{planinfo[6][1]}}">
+    	</div>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <br><br><br>
+    <table class="table">
+      <tr>
+        <td>
+          <div class="row">
+            <div class="col-sm-12"> <label> 课程列表 </label> </div>
+          </div>
+        </td>
+      </tr>
+
+      {% for course in courses%}
+        <tr id="{{course[0]}}_header">
+          <td>
+            <div class="row">
+              <div class="col-sm-8"> {{course[1]}} ( {{course[4]}} 学分 ) </div>
+              <div class="col-sm-4">
+                <button type="button" class="btn btn-success" onclick=add_class({{course[0]}})>添加</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        {% for class_info in classes %}
+          {% if class_info[1] == course[0]%}
+          <tr id="{{class_info[0]}}_row">
+            <td>
+              <div class="row">
+
+                <div class="col-sm-4">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">地点：</span>
+                    </div>
+                    <input type="text" class="form-control" name="{{class_info[0]}}_place" placeholder="地点" required="" value="{{class_info[4]}}">
+                  </div>
+                </div>
+
+                <div class="col-sm-2">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">周</span>
+                    </div>
+                    <input type="text" class="form-control" name="{{class_info[0]}}_week" required="" value="{{class_info[5][0][0]}}" placeholder="周几">
+                  </div>
+                </div>
+
+                <div class="col-sm-2">
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="{{class_info[0]}}_time" placeholder="第几节" required="" value="{{class_info[5][0][1]}}">
+                    <div class="input-group-append">
+                      <span class="input-group-text">节</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-sm-1" >
+                  <a href="#" onclick="del_class('{{class_info[0]}}')">
+                    <i class="fa fa-trash-o fa-2" aria-hidden="true"></i>
+                  </a>
+                </div>
+
+              </div>
+            </td>
+          </tr>
+          {% end %}
+        {% end %}
+
+      {% end %}
+
+    </table>
+
+
+  </div>
+  <!-- <input id="class_list" style="visibility: hidden;"></input> -->
+  <input type="text" name="class_list" id="class_list" value="{{class_list}}" style="visibility: hidden;"></input>
+  <input type="text" name="del_class_list" id="del_class_list" value="" style="visibility: hidden;"></input>
+  <input type="text" name="planid" id="planid" value="{{planid}}" style="visibility: hidden;"></input>
+
+
+      <button class="btn btn-success" id="save_button">保存</button>
+      <button class="btn btn-danger" id="return_button" onclick="goback()">返回</button>
+
+
+
+  </form>
+
+
+  <!-- 模态框 -->
+  <div class="modal fade" id="alert_modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- 模态框头部 -->
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal_title">错误</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- 模态框主体 -->
+        <div class="modal-body" id="modal_content">
+        </div>
+
+        <!-- 模态框底部 -->
+        <div class="modal-footer">
+          <button type="button" id="close_modal" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+  function goback() {
+    window.location.href = "/plans"
+  }
+
+  var class_count = {}
+  console.log(class_count)
+  {% for course in courses%}
+    class_count[{{course[0]}}] = 0;
+  {% end %}
+
+  console.log(class_count)
+
+  function add_class(classid) {
+    // todo 添加第几周到第几周
+
+    $("#" + classid + "_header").after(`
+    <tr id="${classid}_${class_count[classid]}_row">
+      <td>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">地点</span>
+              </div>
+              <input type="text" class="form-control" name="${classid}_${class_count[classid]}_place" placeholder="地点" required="">
+            </div>
+          </div>
+
+          <!--
+          <div class="col-sm-2">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">第</span>
+              </div>
+              <input type="text" class="form-control" name="${classid}_${class_count[classid]}_week" placeholder="开始周" required="">
+            </div>
+          </div>
+          ～
+          <div class="col-sm-2">
+            <div class="input-group">
+              <input type="text" class="form-control" name="${classid}_${class_count[classid]}_week" placeholder="结束周" required="">
+              <div class="input-group-append">
+                <span class="input-group-text">周</span>
+              </div>
+            </div>
+          </div>
+          --!>
+
+          <div class="col-sm-2">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">周</span>
+              </div>
+              <input type="text" class="form-control" name="${classid}_${class_count[classid]}_week" placeholder="周几" required="">
+            </div>
+          </div>
+
+          <div class="col-sm-2">
+            <div class="input-group">
+              <input type="text" class="form-control" name="${classid}_${class_count[classid]}_time" placeholder="第几节" required="">
+              <div class="input-group-append">
+                <span class="input-group-text">节</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-1">
+            <a href="#" onclick="del_class('${classid}_${class_count[classid]}')">
+              <i class="fa fa-trash-o fa-2" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </td>
+    </tr> `)
+    $("#class_list").attr("value", $("#class_list").val() + classid + "_" + class_count[classid] + ",") //最后会多一个 ,
+    class_count[classid] += 1;
+  }
+
+  function del_class(class_str) {
+    console.log("removing", class_str)
+    $("#del_class_list").attr("value", $("#del_class_list").val() + class_str + ",") // 注意最后多一个 ，
+    $("#"+class_str+"_row").remove()
+  }
+
+  $('form').submit(function (event) {
+    console.log("submit event", event.originalEvent.submitter)
+    console.log("submit event", event)
+    if($(event.originalEvent.submitter).attr("id") == "return_button") {
+      console.log("returing")
+      window.location.href = "/plans"
+      return false
+    }
+
+    // 结束时间不能早于开始时间
+    var start = $("#start_day").val() + " " + $("#start_time").val()
+    var end = $("#end_day").val() + " " + $("#end_time").val()
+    console.log("the time for start and end is ", start, end)
+    if(start >= end) {
+      console.log("time error")
+      $('#modal_title').html("错误")
+      $('#modal_content').html("选课结束的时间需要晚于选课开始时间")
+      $('#alert_modal').modal('show')
+      return false;
+    }
+
+    event.preventDefault();
+    var form = $(this);
+    $.ajax({
+      type: form.attr('method'),
+      url: form.attr('action'),
+      data: form.serialize(),
+      dataType: "json",
+      success: function (res) {
+        console.log("submit res", res)
+        if(res['status']=="success") {
+          if($('#planid').attr("value") == "None") {
+            console.log("+++++")
+            $('#close_modal').attr("onclick", `reload(${res['planid']})`)
+          }
+          else {
+            console.log("-------")
+            $('#close_modal').attr("onclick", `reload(-1)`)
+          }
+
+          $("#planid").attr("value", res['planid'])
+          $('#modal_title').html("成功")
+          $('#modal_content').html("选课计划保存成功")
+
+          $('#alert_modal').modal('show')
+
+        }
+        else {
+          $('#modal_title').html("错误")
+          $('#modal_content').html(res['message'])
+          $('#alert_modal').modal('show')
+        }
+      },
+      fail: function (res) {
+        //错误信息
+        $('#modal_content').html("网络错误，请稍后重试")
+        $('#alert_modal').modal('show')
+      }
+    })
+  })
+
+  function reload(planid) {
+    $('#close_modal').attr("onclick", "")
+    console.log("planid is", planid)
+    if(planid  == -1) {
+      window.location.reload();
+    }
+    else {
+      window.location.href = "/editPlan?planid=" + planid
+    }
+  }
+
+</script>
+{% end %}

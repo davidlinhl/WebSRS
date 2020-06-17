@@ -1,0 +1,48 @@
+{% extends "main.html"%}
+
+{% block head %}
+<title>查看所选课程</title>
+{% end %}
+
+{% block body %}
+
+<div class="container">
+
+    <div class="jumbotron">
+        <div align="center">
+            <h2>已选课程</h2>
+        </div>
+    </div>
+
+
+    <div  class="table-responsive" >
+        <table class="table table-bordered table-hover">
+            <thead class="text-center">
+                <tr>
+                  {% for l in l_names %}
+                  <th>{{l}}</th>
+                  {% end %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for class_info in classes %}
+                <tr>
+                    {% for i in range(len(class_info)) %}
+                    <td  rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                        {% if i == 4%}
+                          {% for time in class_info[4]%}
+                          {{time}} <br>
+                          {% end %}
+                        {% else %}
+                        {{class_info[i]}}
+                        {% end %}
+                    </td>
+                    {% end %}
+                </tr>
+            {% end %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% end %}

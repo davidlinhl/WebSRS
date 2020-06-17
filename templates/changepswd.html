@@ -1,0 +1,151 @@
+{% extends "main.html" %}
+
+{% block head %}
+<title>修改密码</title>
+{% end %}
+
+
+{% block body %}
+<div class="container">
+  <div class="jumbotron">
+    <div align="center">
+      <h1>修改密码</h1>
+    </div>
+  </div>
+
+  <form role="form" id="form" method="post">
+    <div class='col-sm-6'>
+      <div class="form-group">
+          <label for="oldpasswd">旧密码</label>
+          <input type="password" class="form-control" name="oldpasswd" id="oldpasswd" required="">
+          <br>
+      </div>
+
+      <div class="form-group">
+          <label for="newpasswd">新密码</label>
+          <input type="password" class="form-control" name="newpasswd" id="newpasswd" required="">
+          <br>
+      </div>
+
+      <div class="form-group">
+          <label for="repeatpasswd">确认新密码:</label>
+          <input type="password" class="form-control" name="newpasswdagain" id="repeatpasswd" required="">
+          <br>
+      </div>
+    </div>
+
+    <button class="btn btn-primary">确认修改</button>
+    <button onclick=goback() class="btn btn-danger">返回</button>
+    </div>
+  </form>
+
+
+<!-- 模态框 -->
+<div class="modal fade" id="alert_modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- 模态框头部 -->
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_title">错误</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- 模态框主体 -->
+      <div class="modal-body" id="modal_content">
+      </div>
+
+      <!-- 模态框底部 -->
+      <div class="modal-footer">
+        <button type="button" id="close_modal" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  //校验密码强度---沒有匹配到以下級別就提示
+    function checkPassWord(value){
+        // 0： 表示第一个级别 1：表示第二个级别 2：表示第三个级别
+        // 3： 表示第四个级别 4：表示第五个级别
+        var arr=[],array=[1,2,3,4];
+        if(value.length < 6){//最初级别
+            return 0;
+        }
+        if(/\d/.test(value)){//如果用户输入的密码 包含了数字
+            arr.push(1);
+        }
+        if(/[a-z]/.test(value)){//如果用户输入的密码 包含了小写的a到z
+            arr.push(2);
+        }
+        if(/[A-Z]/.test(value)){//如果用户输入的密码 包含了大写的A到Z
+            arr.push(3);
+        }
+        if(/\W/.test(value)){//如果是非数字 字母 下划线
+            arr.push(4);
+        }
+        for(var i=0;i<array.length;i++){
+            if(arr.indexOf(array[i])==-1){
+                return array[i];
+            }
+        }
+    }
+    console.log(checkPassWord("112211"));
+    $(document).ready(function(){
+      $('#form').submit(function (event) {
+        event.preventDefault();
+        console.log("form submit clicked");
+        var old_pswd = $('#oldpasswd').val();
+        var new_pswd = $('#newpasswd').val();
+        var again_pswd = $("#repeatpasswd").val();
+        console.log("pswds are", old_pswd, new_pswd, again_pswd);
+        console.log(old_pswd.length)
+        if(old_pswd.length == 0) {
+          $('#modal_content').html("旧密码不能为空")
+          $('#alert_modal').modal('show')
+          return false;
+        }
+        if(new_pswd.length == 0) {
+          $('#modal_content').html("新密码不能为空")
+          $('#alert_modal').modal('show')
+          return false;
+        }
+        if(new_pswd != again_pswd) {
+          $('#modal_content').html("两次新密码输入不一致")
+          $('#alert_modal').modal('show')
+          return false;
+        }
+
+        $.ajax({
+          url:"/changepasswd",
+          type: "POST",
+          data: {
+            old_pswd: old_pswd,
+            new_pswd: new_pswd,
+          },
+          dataType: "json",
+          success:function(res) {
+            if(res["result"] == 'success') {
+              $('#modal_title').html("成功")
+              $('#modal_content').html("密码已经成功修改")
+              $('#close_modal').attr("onclick", "goback()")
+              $('#alert_modal').modal('show')
+              return false;
+            }
+            else {
+              $('#modal_content').html(res['reason'])
+              $('#alert_modal').modal('show')
+              return false;
+            }
+          }
+        });
+
+      })
+    })
+  function goback(){
+    window.location.href="/userinfo";
+  }
+
+</script>
+{% end %}

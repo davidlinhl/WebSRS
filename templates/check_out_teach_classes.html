@@ -1,0 +1,100 @@
+{% extends "main.html" %}
+
+{% block head %}
+<title>查看所教课程</title>
+
+{% end %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron">
+        <div align="center">
+            <h2>所教课程</h2>
+        </div>
+    </div>
+<div  class="table-responsive">
+  {% if len(classes) == 0%}
+
+    <table class="table table-bordered table-hover" >
+        <thead class="text-center">
+          <tr>
+            {% for l in l_names %}
+            <th>{{l}}</th>
+            {% end %}
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for cl in classes %}
+          <tr>
+            {% for i in range(len(cl)-2) %}
+            <td  rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                {% if i == 4%}
+                  {% for time in cl[4]%}
+                  {{time}} <br>
+                  {% end %}
+                {% else %}
+                {{cl[i]}}
+                {% end %}
+            </td>
+              {% end %}
+
+            <td  rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                <a href="teacher_student?classid={{cl[6]}}" class="btn btn-info" role="button">查看选课学生</a>
+            </td>
+            <td  rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                <a href="enter_grade?classid={{cl[6]}}" class="btn btn-info" role="button">登记成绩</a>
+            </td>
+            <td>
+
+
+             <form  action="teacher_class?classid={{cl[6]}}"  method="post"  onsubmit="return check_public({{cl[7]}})">
+
+		            <input class="btn btn-info" type="submit" value="退选" >
+                  </form>
+
+            </td>
+          </tr>
+            {% end %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+<script>
+  toastr.options = { // toastr配置
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "progressBar": false, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
+        "positionClass": "toast-top-right",//显示的动画时间
+        "showDuration": "400", //显示的动画时间
+        "hideDuration": "1000", //消失的动画时间
+        "timeOut": "7000", //展现时间
+        "extendedTimeOut": "1000", //加长展示时间
+        "showEasing": "swing", //显示时的动画缓冲方式
+        "hideEasing": "linear", //消失时的动画缓冲方式
+        "showMethod": "fadeIn", //显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    }
+
+    var check_public=function(x)
+    {
+        console.log(x)
+        if(x=="1")
+        {
+            toastr.error("本学期注册已结束，不能更改教授课程信息。如果注册结束后需要更换授课教师，请联系教务主任处理","退选失败");
+            return false;
+        }
+        if(x=="0")
+        {
+            toastr.success("退课成功！","成功");
+            return true;
+        }
+    }
+
+
+</script>
+
+{% end %}

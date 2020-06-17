@@ -1,0 +1,333 @@
+{% extends "main.html" %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{{static_url('jquery-sortable.css')}}">
+<link rel="stylesheet" href="{{static_url('bs2.css')}}">
+<script src="{{static_url('jquery-sortable-min.js')}}"></script>
+<title>选课</title>
+{% end %}
+
+
+
+{% block body %}
+
+<div class="container">
+
+  <div class="jumbotron">
+    <div align="center">
+      <h2>{{title}}</h2>
+    </div>
+  </div>
+
+
+
+<div align="center">
+  <div class="col-sm-6">
+    <select class="select" id="plan_selector" onchange="change_plan()">
+        <option value='-1'>请选择选课计划</option>
+      {% for plan in plans %}
+        <option value ="{{plan[0]}}"  >{{plan[2]}}</option>
+      {% end %}
+    </select>
+  </div>
+</div>
+<br><br><br>
+
+<div class="bs2" id="class_table">
+  <text>选课时间：&nbsp;</text>
+  <text id="start_time_text"></text> ~
+  <text id="end_time_text"></text>  &nbsp; &nbsp;
+  <text id="status_text"></text> <br><br>
+
+  <table class=" table table-hover sorted_table" >
+    <thead>
+      <tr>
+        <th>课程名称</th>
+        <th>老师</th>
+        <th>上课时间</th>
+        <th>上课地点</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+
+
+    <tbody id="class_content"> <!--每次选课这个元素整个内容删除更新-->
+    </tbody>
+
+  </table>
+  <button class="btn btn-success" id="save_button" onclick="save_order()">保存排序</button>
+</div>
+
+</div>
+
+
+<script type="text/javascript">
+
+  toastr.options = { // toastr配置
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "progressBar": false, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
+        "positionClass": "toast-top-right",//显示的动画时间
+        "showDuration": "400", //显示的动画时间
+        "hideDuration": "1000", //消失的动画时间
+        "timeOut": "7000", //展现时间
+        "extendedTimeOut": "1000", //加长展示时间
+        "showEasing": "swing", //显示时的动画缓冲方式
+        "hideEasing": "linear", //消失时的动画缓冲方式
+        "showMethod": "fadeIn", //显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    }
+
+  var group = $('.sorted_table').sortable({
+    // 初始化可以拖动的课程表格
+      group:'classes',
+      containerSelector: 'table',
+      itemPath: '> tbody',
+      itemSelector: 'tr',
+      placeholder: '<tr class="placeholder"/>',
+      onDrop: function ($item, container, _super) {
+        _super($item, container);
+      }
+  });
+
+  function save_order() {
+    // 保存课程排序
+    var classids = Array()
+    sec_ids = ""
+
+    trs = $("tbody tr")
+    for(var ind=0;ind <trs.length;ind++) {
+      if($(trs[ind]).attr("is_1st") == '0') {
+        sec_ids += $(trs[ind]).attr("classid") + ","
+      }
+      classids.push($(trs[ind]).attr("classid"))
+    }
+    console.log("second ids", sec_ids)
+
+    $.ajax({
+      url:"/chooseClass/set_order",
+      type: "POST",
+      data: {
+        classids: JSON.stringify(classids),
+        pid: $("#plan_selector").val(),
+        sid: {{studentid}},
+        order_2nd: sec_ids,
+      },
+      dataType: "json",
+      success: function(res) {
+        console.log("ajax ret")
+        console.log("set plan order res", res)
+        if(res['status'] != "success") {
+          toastr.error(res['message'], "保存选课顺序失败")
+        } else {
+          toastr.success(res['message'], "保存选课顺序成功")
+        }
+      },
+      fail: function(res) {
+        console.log("req fail", res)
+      }
+    })
+
+
+    // console.log(classids)
+  }
+
+
+  /* 切换选课计划时调用，删除所有课程信息，添加该选课计划的信息*/
+  function change_plan() {
+    var new_planid = $("#plan_selector").val();
+    console.log("showing plan", new_planid)
+    if(new_planid == '-1') {
+      $("#class_table").hide()
+      $("#save_button").hide()
+      return false
+    }
+    else {
+      $("#class_table").show()
+      $("#save_button").show()
+    }
+
+    $.ajax({
+      url:"/chooseClass/get_class",
+      type: "POST",
+      data: {
+        planid: new_planid,
+        sid: {{studentid}},
+      },
+      dataType: "json",
+      success:function(res) {
+        console.log("new plan class info", res['classes'])
+        if(res['status'] != "success")
+        {
+          toastr.error(res['message'], "获取计划课程失败")
+          return false;
+        }
+
+        var classes = res['classes']
+        $("#class_content").empty()
+
+        for(var i=0; i<classes.length; i++ ) {
+          console.log("课程信息", classes[i])
+          clas = classes[i]
+
+          tr_content = `
+            <tr classid="${clas[0]}" is_1st="-1">
+              <td>${clas[6]}</td>
+              <td>${clas[7]}</td>
+              <td>${clas[8]}</td>
+              <td>${clas[4]}</td>
+              <td course="${clas[1]}" class="${clas[0]}" name="1st">
+                <button  class="btn btn-success" onclick="choose_class({{studentid}}, ${clas[0]}, 1, '${clas[6]}', ${clas[1]})" >首选</button>
+              </td>
+              <td course="${clas[1]}" class="${clas[0]}" name="2nd">
+                <button class="btn btn-success" onclick="choose_class({{studentid}}, ${clas[0]}, 0, '${clas[6]}', ${clas[1]})">备选</button>
+              </td>
+            </tr>
+            `
+          $("#class_content").append(tr_content)
+        }
+
+
+        for(var ind=0;ind<classes.length;ind++) {
+          clas = classes[ind]
+          if(clas[9] != -1 ) {
+            // 对已经首选或者备选的课程修改按钮
+            choose_jq(clas[1], clas[0], clas[6], clas[9])
+          }
+        }
+        $("#start_time_text").html(res['planinfo'][5])
+        $("#end_time_text").html(res['planinfo'][6])
+        $("#status_text").html("选课正在进行")
+        if( "{{curr_time}}" <res['planinfo'][5]) {
+          // 未到选课时间
+          $("#status_text").html("未到选课时间")
+          $("button").attr('disabled',"true")
+          $("#save_button").removeAttr("disabled")
+        }
+
+        if( "{{curr_time}}" >res['planinfo'][6]) {
+          // 已经过选课时间
+          $("#status_text").html("选课已结束")
+          $("button").attr('disabled',"true")
+        }
+
+      }
+    })
+  }
+  change_plan() //开始就调用一回，隐藏button
+
+  function unchoose_jq(courseid, classid, course_name) {
+    console.log("unchoosejq", courseid, classid, course_name)
+    $(`tr[classid=${classid}]`).attr("is_1st", "-1")
+    var tr_1sts  = $(`[course=${courseid}][name=1st]`)
+    console.log("found", tr_1sts.length)
+    for(var ind=0;ind<tr_1sts.length;ind++) {
+      console.log("tr1st", tr_1sts[ind])
+      $(tr_1sts[ind]).html(`
+        <button class="btn btn-success" onclick="choose_class({{studentid}}, ${classid}, 1, '${course_name}', ${courseid})" >首选</button>
+      `)
+    }
+    var tr_2nds = $(`[course=${courseid}][name=2nd]`)
+    for(var ind=0;ind<tr_2nds.length;ind++) {
+      $(tr_2nds[ind]).html(`
+          <button class="btn btn-success" onclick="choose_class({{studentid}}, ${classid}, 0, '${course_name}', ${courseid})">备选</button>
+      `)
+    }
+  }
+
+
+  function choose_jq(courseid, classid, course_name, is_1st) {
+    console.log("selecting 1st", courseid, classid)
+    $(`tr[classid=${classid}]`).attr("is_1st", is_1st)
+    var tr_1sts  = $(`[course=${courseid}][name=1st]`)
+    for(var ind=0;ind<tr_1sts.length;ind++) {
+      console.log("tr1st", tr_1sts[ind])
+
+      $(tr_1sts[ind]).attr("is_1st", is_1st)
+      if(is_1st){
+        $(tr_1sts[ind]).html("已选首选")
+      }
+      else {
+        $(tr_1sts[ind]).html("已选备选")
+      }
+    }
+    var tr_2nds = $(`[course=${courseid}][name=2nd]`)
+    for(var ind=0;ind<tr_2nds.length;ind++) {
+      $(tr_2nds[ind]).html(`
+            <button class="btn btn-danger" onclick="unchoose_class({{studentid}}, ${classid}, 0, '${course_name}', ${courseid})">退选</button>
+      `)
+    }
+  }
+
+
+
+
+  function unchoose_class(sid, cid, is_1st, course_name, courseid) {
+    console.log("unchoosing class", sid, cid, is_1st, course_name, courseid)
+    $.ajax({
+      url:"/chooseClass/unchoose",
+      type: "POST",
+      data: {
+        pid: $("#plan_selector").val(),
+        sid: sid,
+        cid: cid,
+        courseid: courseid,
+        is_1st: is_1st, // -1首选， -2备选
+      },
+      dataType: "json",
+      success: function(res) {
+        console.log("取消ajax 返回", res)
+        console.log("res", res["status"])
+        if(res["status"] == "success") {
+          // 退选成功
+          unchoose_jq(courseid, cid, course_name)
+          console.log("unchoose success")
+          toastr.success(course_name + " 取消选课", "成功")
+        }
+        else {
+          // 选课失败
+          console.log("showing fail")
+          toastr.error(res['message'], "失败");
+        }
+
+      }
+    })
+  }
+
+  function choose_class(sid, cid, is_1st, course_name, courseid) {
+    console.log("choosing", sid, cid, is_1st, course_name, courseid)
+    $.ajax({
+      url:"/chooseClass/choose",
+      type: "POST",
+      data: {
+        pid: $("#plan_selector").val(),
+        sid: sid,
+        cid: cid,
+        courseid: courseid,
+        is_1st: is_1st, // -1首选， -2备选
+      },
+      dataType: "json",
+      success: function(res) {
+        console.log("选课ajax 返回", res)
+        console.log("res", res["status"])
+        if(res["status"] == "success") {
+          // 选课成功
+          choose_jq(courseid, cid, course_name, is_1st)
+          console.log("shwing success")
+          toastr.success(course_name + " 选课成功", "成功")
+        }
+        else {
+          // 选课失败
+          console.log("shwing fail")
+          toastr.error(res['message'], "失败");
+        }
+
+      }
+    })
+  }
+
+</script>
+
+{% end %}

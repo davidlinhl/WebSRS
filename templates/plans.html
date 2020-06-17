@@ -1,0 +1,208 @@
+{% extends "main.html" %}
+
+
+{% block head %}
+<title>查看所有选课计划</title>
+{% end %}
+
+{% block body %}
+
+<div class="container">
+  <div class="jumbotron">
+    <div align="center">
+      <h2>选课计划</h2>
+    </div>
+  </div>
+
+ {% if role == b"admin" %}
+
+<!-- TODO: 选课计划发布后 编辑和删除 按钮屏蔽 -->
+    <a href="/editPlan" class="btn btn-info" role="button">添加选课计划</a>
+    <br><br>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="text-center">
+                <tr>
+                    {% for l in l_names %}
+                    <th>{{l}}</th>
+                    {% end %}
+                </tr>
+            </thead>
+
+
+            <tbody>
+             {% for i in range(len(plans)) %}
+             <!-- {{plans[i]}} -->
+                <tr id="{{plans[i][5]}}_tr">
+                    {% for j in range(5) %}
+                        <td rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                            {{plans[i][j]}}
+                        </td>
+                    {% end %}
+                    <td rowspan=$rowspan style='vertical-align: middle !important;text-align: center;' id="{{plans[i][5]}}_publish">
+                      {% if plans[i][6] == 0%}
+                        <a href="#" onclick="publish_plan({{plans[i][5]}}, '{{plans[i][0]}}')" class="btn btn-info" role="button" >发布</a>
+                      {% else %}
+                        已发布
+                      {% end %}
+                    </td>
+                    <td rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                      {% if plans[i][6] == 0%}
+                        <a href="/editPlan?planid={{plans[i][5]}}" class="btn btn-info" role="button">编辑</a>
+                      {% else %}
+                        不能继续编辑
+                      {% end %}
+
+                    </td>
+                    <td rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                        <a href="/endregistration?planid={{plans[i][5]}}" class="btn btn-info" role="button">结束选课</a>
+                    </td>
+
+                    <td rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                      {% if plans[i][6] == 0%}
+                        <a href="#" class="btn btn-danger" role="button" onclick="delete_plan({{plans[i][5]}}, '{{plans[i][0]}}')"">删除</a>
+                      {% else %}
+                        不能删除
+                      {% end %}
+
+                    </td>
+                </tr>
+            {% end %}
+            </tbody>
+            </div>
+            {% end %}
+
+
+            {% if role == b"teacher" %}
+            <div  class="table-responsive">
+                  {% if len(plans) == 0 %}
+                  <br><br><br>
+                  <div align="center">
+                    <text>当前没有可选选课计划</text>
+                  </div>
+
+                  {% else %}
+                  <table class="table table-bordered table-hover">
+                    <thead class="text-center">
+                        <tr>
+                            {% for l in l_names %}
+                            <th>{{l}}</th>
+                            {% end %}
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {% for i in range(len(plans)) %}
+
+                        <tr >
+                                {% for j in range(5) %}
+                            <td rowspan=$rowspan style='vertical-align: middle !important;text-align: center;'>
+                                {{plans[i][j]}}
+                            </td>
+                                {% end %}
+                            <td class="text-center">
+                              {% if plans[i][6] == 0%}
+                                <a href="tscourse?planid={{plans[i][5]}}" class="btn btn-info" role="button">选择该计划</a>
+                              {% else %}
+                                <text>已公布，无法选课</text>
+                              {% end %}
+
+                            </td>
+
+                        </tr>
+                            {% end %}
+                    </tbody>
+            {% end %}
+                </table>
+                {% end %}
+            </div>
+
+</div>
+<script>
+    // function check_public(x)
+    // {
+    //     console.log(x)
+    //     if(x=="1")
+    //     {
+    //         alert("该选课计划已公开，您无权继续选课！");
+    //         return false;
+    //     }
+    //     if(x=="0")
+    //     {
+    //         return true;
+    //     }
+    // }
+</script>
+
+
+<script type="text/javascript">
+
+  toastr.options = { // toastr配置
+        "closeButton": true, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "progressBar": false, //是否显示进度条，当为false时候不显示；当为true时候，显示进度条，当进度条缩短到0时候，消息通知弹窗消失
+        "positionClass": "toast-top-right",//显示的动画时间
+        "showDuration": "400", //显示的动画时间
+        "hideDuration": "1000", //消失的动画时间
+        "timeOut": "7000", //展现时间
+        "extendedTimeOut": "1000", //加长展示时间
+        "showEasing": "swing", //显示时的动画缓冲方式
+        "hideEasing": "linear", //消失时的动画缓冲方式
+        "showMethod": "fadeIn", //显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
+    }
+
+    function delete_plan(planid, planname) {
+      console.log(planid, planname)
+      $.ajax({
+        type: "POST",
+        url: "editPlan/delete",
+        data: {
+          planid: planid
+        },
+        dataType: "json",
+        success: function (res) {
+          console.log(res)
+          if(res['status'] == "success") {
+            toastr.success(planname  + " " + res['message'], "成功删除")
+            $("#" + planid + "_tr").empty()
+          }
+          else {
+            toastr.error(planname + " " + res['message'], "删除失败")
+          }
+        }
+      })
+    }
+
+// TODO: publish的时候会删除没老师的课，要用户确认
+  function publish_plan(planid, planname) {
+    // TODO: 发布之后改变删除和编辑计划按钮的状态
+    console.log(planid, planname)
+    $.ajax({
+      type: "POST",
+      url: "editPlan/publish",
+      data: {
+        planid: planid
+      },
+      dataType: "json",
+      success: function (res) {
+        console.log(res)
+        if(res['status'] == "success") {
+          toastr.success(planname + " " + res['message'], "发布成功")
+        }
+        else {
+          toastr.error(planname + " " + res['message'], "发布失败")
+        }
+      }
+    })
+    $("#" + planid + "_publish").empty()
+    $("#" + planid + "_publish").html("已发布")
+
+  }
+
+
+</script>
+
+
+{% end %}
